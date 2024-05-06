@@ -1,0 +1,15 @@
+---
+- name: add couchbase meta
+  apt:
+    deb: https://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-noarch.deb 
+  
+- name: install couchbase
+  apt:     
+    pkg: couchbase-server
+    update_cache: true
+
+- name: enable and start the service
+  systemd: 
+    name: couchbase-server.service
+    state: restarted
+    enabled: true

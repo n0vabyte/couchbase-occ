@@ -1,0 +1,13 @@
+---
+# roles/post/tasks/main.yml
+- name: add nginx reverse proxy for webui
+  import_tasks: nginx.yml
+
+- name: adding sudo user
+  import_tasks: sudouser.yml
+
+- name: add user ssh keys
+  import_tasks: sshkeys.yml
+
+- name: dumping credentials locally
+  import_tasks: creds.yml

@@ -1,0 +1,229 @@
+---
+- name: wait
+  pause: 
+    seconds: 30
+# there is a built-in action to convert provisioner hostname from loopback to host ip when you add a second node to the cluster
+# minimum plan size = 8gb / g6-standard-4
+# 3 of data
+# 2 of index,query
+# 80% of memory in MiB
+- name: init the 8gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 5722 \
+      --cluster-index-ramsize 5722 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-4') or 
+        (type == 'g6-dedicated-4') or 
+        (type == 'g7-premium-4') | bool
+
+- name: init the 16gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 13107 \
+      --cluster-index-ramsize 13107 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-6') or 
+        (type == 'g6-dedicated-8') or 
+        (type == 'g7-premium-4') | bool
+
+- name: init the 32gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 26214 \
+      --cluster-index-ramsize 26214 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-8') or 
+        (type == 'g6-dedicated-16') or 
+        (type == 'g7-premium-16') | bool
+
+- name: init the 64gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 52428 \
+      --cluster-index-ramsize 52428 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-16') or 
+        (type == 'g6-dedicated-32') or
+        (type == 'g7-premium-32') | bool
+
+- name: init the 96gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 78643 \
+      --cluster-index-ramsize 78643 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-20') or
+        (type == 'g6-dedicated-48') or
+        (type == 'g7-premium-48') | bool
+
+- name: init the 128gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 104857 \
+      --cluster-index-ramsize 104857 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-24') or
+        (type == 'g6-dedicated-50') or
+        (type == 'g7-premium-50') | bool
+
+- name: init the 192gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 157286 \
+      --cluster-index-ramsize 157286 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-standard-32') | bool 
+
+- name: init the 256gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 209715 \
+      --cluster-index-ramsize 209715 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g6-dedicated-56') or
+        (type == 'g7-premium-56') | bool
+
+- name: init the 24gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 19660 \
+      --cluster-index-ramsize 19660 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g7-highmem-1') | bool
+
+- name: init the 48gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 39321 \
+      --cluster-index-ramsize 39321 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g7-highmem-2') | bool
+
+- name: init the 90gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 73728 \
+      --cluster-index-ramsize 73728 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g7-highmem-4') | bool
+
+- name: init the 150gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 122880 \
+      --cluster-index-ramsize 122880 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g7-highmem-8') | bool
+
+- name: init the 300gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize 245760 \
+      --cluster-index-ramsize 245760 \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  when: (type == 'g7-highmem-16 ') | bool
