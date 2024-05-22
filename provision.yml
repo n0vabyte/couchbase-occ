@@ -6,18 +6,22 @@
     - group_vars/couchbase/vars
     - group_vars/couchbase/secret_vars
 
-  vars: 
-    count: '{{ servers - 1 }}' # udf 
-    
+  #vars: 
+  #  count: '{{ servers - 1 }}' # udf 
+
   tasks: 
+  - name: set couchbase memory
+    lineinfile:
+      path: ./group_vars/couchbase/vars
+      marker: "# {mark} Couchbase Memory Quota"  
+      line: 
+        - cb_mem: "{{ ((ansible_memtotal_mb.real.free - 1024) * 0.8) | int }}" 
+      insertafter: eof
+  
   - name: check minumum node size
     fail: 
       msg: "CouchBase Server requires a minumum of 8GB RAM"
-    when: (type == 'g6-nanode-1') or 
-          (type == 'g6-standard-1') or 
-          (type == 'g6-standard-2') or 
-          (type == 'g6-dedicated-2') or 
-          (type == 'g7-premium-2') | bool
+    when: cb_mem < 5530
 
   - name: create couchbase cluster
     linode.cloud.instance: 
@@ -33,14 +37,14 @@
       ua_prefix: 'marketplace-couchbase-occ'
       tags: '{{ cluster_uuid }}'
       state: present
-    with_sequence: count='{{ count }}'
+    with_sequence: count='{{ server_count - 1 }}'
 
   - name: collect cluster details
     linode.cloud.instance_info:
       api_token: '{{ api_token }}'
       label: '{{ instance_prefix }}-{{ item | int }}-{{ uuid }}'
     register: cluster_info
-    with_sequence: count='{{ servers }}'
+    with_sequence: count='{{ server_count }}'
 
   - name: update group_vars with server variables
     blockinfile:
@@ -50,7 +54,7 @@
         #jinja2: trim_blocks:False
         couchbase_data:
           server:
-            {%- for count in range(count | int + 1) %}
+            {%- for count in range(server_count | int + 1) %}
             - couchbase-server-{{ count }}:
               instance:
                 hostname: {{ cluster_info.results[count].instance.label | replace('_', '-') }}
@@ -68,7 +72,7 @@
         #jinja2: trim_blocks:False
         [couchbase_cluster]
         localhost ansible_connection=local user=root
-        {%- for count in range(count | int) %}
+        {%- for count in range(server_count | int) %}
         {{ cluster_info.results[count + 1].instance.ipv4[0] }}
         {%- endfor %}
 

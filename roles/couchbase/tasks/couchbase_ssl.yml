@@ -96,10 +96,6 @@
     group: couchbase
     mode: 0700
 
-- name: wait
-  pause:
-    seconds: 30
-
 - name: reload the trusted keys 
   uri: 
     url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/node/controller/loadTrustedCAs"
