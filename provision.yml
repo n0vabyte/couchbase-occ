@@ -13,15 +13,13 @@
   - name: set couchbase memory
     lineinfile:
       path: ./group_vars/couchbase/vars
-      marker: "# {mark} Couchbase Memory Quota"  
-      line: 
-        - cb_mem: "{{ ((ansible_memtotal_mb.real.free - 1024) * 0.8) | int }}" 
-      insertafter: eof
+      line: | 
+         cb_mem: "{{ ((ansible_memtotal_mb.real.free - 1024) * 0.8) | int }}" 
   
-  - name: check minumum node size
+  - name: check minumum memory
     fail: 
       msg: "CouchBase Server requires a minumum of 8GB RAM"
-    when: cb_mem < 5530
+    when: cb_mem | int < 5530
 
   - name: create couchbase cluster
     linode.cloud.instance: 
