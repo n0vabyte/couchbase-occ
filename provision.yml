@@ -6,15 +6,12 @@
     - group_vars/couchbase/vars
     - group_vars/couchbase/secret_vars
 
-  #vars: 
-  #  count: '{{ servers - 1 }}' # udf 
-
   tasks: 
   - name: set couchbase memory
     lineinfile:
       path: ./group_vars/couchbase/vars
       line: | 
-         cb_mem: "{{ ((ansible_memtotal_mb.real.free - 1024) * 0.8) | int }}" 
+         cb_mem: '{{ ((ansible_memtotal_mb - 1024) * 0.8) | int }}' 
   
   - name: check minumum memory
     fail: 
@@ -52,7 +49,7 @@
         #jinja2: trim_blocks:False
         couchbase_data:
           server:
-            {%- for count in range(server_count | int + 1) %}
+            {%- for count in range(server_count | int) %}
             - couchbase-server-{{ count }}:
               instance:
                 hostname: {{ cluster_info.results[count].instance.label | replace('_', '-') }}
@@ -60,8 +57,6 @@
                 ip_priv1: {{ cluster_info.results[count].instance.ipv4[1] }}
             {%- endfor %}        
          
-
-
   - name: update inventory
     blockinfile:
       path: ./hosts
@@ -70,7 +65,7 @@
         #jinja2: trim_blocks:False
         [couchbase_cluster]
         localhost ansible_connection=local user=root
-        {%- for count in range(server_count | int) %}
+        {%- for count in range(server_count - 1) %}
         {{ cluster_info.results[count + 1].instance.ipv4[0] }}
         {%- endfor %}
 
