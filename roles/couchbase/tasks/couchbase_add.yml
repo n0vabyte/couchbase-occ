@@ -1,5 +1,5 @@
 ---
-- name: add data nodes 2 and 3
+- name: add data nodes
   shell: |
       /opt/couchbase/bin/couchbase-cli server-add -c couchbase://{{ couchbase_data.server[0].instance.ip_pub1 }} \
       --username Administrator \
@@ -11,7 +11,7 @@
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
 
-- name: add query + index nods 4 and 5
+- name: add query and index nodes
   shell: |
       /opt/couchbase/bin/couchbase-cli server-add -c couchbase://{{ couchbase_data.server[0].instance.ip_pub1 }} \
       --username Administrator \

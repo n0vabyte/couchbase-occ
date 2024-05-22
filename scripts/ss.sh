@@ -11,14 +11,12 @@ trap "cleanup $? $LINENO" EXIT
 
 # git repo
 git_username="akamai-compute-marketplace"
-export GIT_REPO_1="https://github.com/$git_username/couchbase-occ.git"
+export GIT_REPO="https://github.com/$git_username/couchbase-occ.git"
 export DEBIAN_FRONTEND=non-interactive
 export UUID=$(uuidgen | awk -F - '{print $1}')
 
 # enable logging
 exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
-# source script libraries
-source <ssinclude StackScriptID=1>
 
 function cleanup {
   if [ "$?" != "0" ] || [ "$SUCCESS" == "true" ]; then
@@ -95,9 +93,9 @@ function setup {
     curl -sH "Content-Type: application/json" -H "Authorization: Bearer ${TOKEN_PASSWORD}" https://api.linode.com/v4/profile/sshkeys | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
   fi
   # clone repo and set up ansible environment
-  git clone ${GIT_REPO_1} /tmp/linode
+  git clone ${GIT_REPO} /tmp/linode
   # clone one branch to test 
-  # git clone -b develop ${GIT_REPO_1} /tmp/linode
+  # git clone -b develop ${GIT_REPO} /tmp/linode
   cd /tmp/linode
   pip3 install virtualenv
   python3 -m virtualenv env

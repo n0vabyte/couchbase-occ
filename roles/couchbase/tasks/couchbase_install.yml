@@ -8,7 +8,7 @@
     pkg: couchbase-server
     update_cache: true
 
-- name: enable and start the service
+- name: enable and start couchbase
   systemd: 
     name: couchbase-server.service
     state: restarted

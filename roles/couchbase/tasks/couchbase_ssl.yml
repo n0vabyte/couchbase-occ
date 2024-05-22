@@ -25,6 +25,7 @@
     ca_password: "{{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits,punctuation') }}"
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  no_log: true
 
 - name: generate private key for provisioner-cluster
   community.crypto.openssl_privatekey_pipe:

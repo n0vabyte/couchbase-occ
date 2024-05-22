@@ -40,7 +40,7 @@
       api_token: '{{ api_token }}'
       label: '{{ instance_prefix }}-{{ item | int }}-{{ uuid }}'
     register: cluster_info
-    with_sequence: count='{{ count | int + 1 }}'
+    with_sequence: count='{{ servers }}'
 
   - name: update group_vars with server variables
     blockinfile:
@@ -59,11 +59,6 @@
             {%- endfor %}        
          
 
-  - name: test connectivity
-    ping: 
-    with_items: "{{ item.instance.ipv4[0] }}"
-    loop: 
-    - "{{ cluster_info.results }}"
 
   - name: update inventory
     blockinfile:

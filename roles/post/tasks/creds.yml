@@ -17,9 +17,5 @@
       # Couchbase Server User
 
       Administrator: {{ couchbase_admin_pass }}
-
-      # Cluster Tag 
-      cluster_uuid: {{ cluster_uuid }}
-    
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
