@@ -1,5 +1,5 @@
 ---
-- name: wait
+- name: wait to avoid HTTPConnectionPool lockout
   pause: 
     seconds: 30
 # there is a built-in action to convert provisioner hostname from loopback to host ip when you add a second node to the cluster
