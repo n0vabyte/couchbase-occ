@@ -39,7 +39,7 @@
   community.crypto.openssl_csr_pipe:
     privatekey_passphrase: '{{ ca_password }}'
     privatekey_content: '{{ ca_key.privatekey }}'
-    common_name: "CN=Couchbase Root CA"
+    common_name: "Couchbase Root CA"
     basic_constraints: "CA:TRUE"
     authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}"
     authority_cert_serial_number: 1
@@ -66,7 +66,7 @@
   community.crypto.openssl_csr:
     path: '{{ ssl_dir }}/couchbase.csr'
     privatekey_path: '{{ ssl_dir }}/pkey.key'
-    common_name: "CN=Couchbase Server"
+    common_name: "Couchbase Server"
     basic_constraints: "CA:FALSE"
     create_subject_key_identifier: true
     authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}" 
