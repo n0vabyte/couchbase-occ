@@ -36,7 +36,7 @@
     block: |
       #jinja2: trim_blocks:False
       # couchbase
-      {%- for count in range(servers) %}
+      {%- for count in range(server_count | int) %}
       {{ couchbase_data.server[count].instance.ip_pub1 }} {{ couchbase_data.server[count].instance.hostname }}
       {%- endfor %}  
 

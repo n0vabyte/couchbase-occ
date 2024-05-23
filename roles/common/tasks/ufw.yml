@@ -1,5 +1,6 @@
 ---
 # allowed ports include all couchbase services for dynamic scaling
+# 1.2 include IP specific rules for intra-cluster
 - name: add ports
   community.general.ufw:
     rule: allow
