@@ -109,3 +109,15 @@
       password: '{{ couchbase_admin_pass }}'    
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
+
+- name: reload the node certs
+  uri: 
+    url: "http://{{ ansible_default_ipv4.address }}:8091/node/controller/reloadCertificates"
+    method: POST
+    user: 'Administrator'
+    password: '{{ couchbase_admin_pass }}'
+    status_code: 200
+    body_format: json
+    body: 
+      name: 'Administrator'
+      password: '{{ couchbase_admin_pass }}'
