@@ -123,3 +123,13 @@
 # each node reloads their own certs in sequence
 # "message": "Address specified in cert SAN part can't be verified.", "name": "cert_san_invalid", "severity": 2, "severityName": "minimal" 
 # the above is an expected error. cert reload DOES succeed. check with CB about correct SAN format.
+- name: remove the generated self-signed CA
+  uri:
+    url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/pools/default/trustedCAs/0"
+    method: DELETE
+    user: 'Administrator'
+    password: '{{ couchbase_admin_pass }}'
+    status_code: 200
+    force_basic_auth: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true

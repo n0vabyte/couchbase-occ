@@ -19,3 +19,8 @@
       Administrator: {{ couchbase_admin_pass }}
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: write MOTD with Web UI Address
+  template:
+    src: templates/motd.j2
+    dest: /etc/motd
