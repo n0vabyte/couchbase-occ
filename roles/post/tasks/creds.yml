@@ -24,3 +24,5 @@
   template:
     src: templates/motd.j2
     dest: /etc/motd
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
