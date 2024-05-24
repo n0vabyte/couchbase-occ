@@ -14,4 +14,4 @@
       label: '{{ instance_prefix }}-server-{{ item | int + 1 }}-{{ uuid }}'
       api_token: '{{ api_token }}'
       state: absent
-    with_sequence: count='{{ server_count - 1 }}'
+    with_sequence: count='{{ server_count }}'
