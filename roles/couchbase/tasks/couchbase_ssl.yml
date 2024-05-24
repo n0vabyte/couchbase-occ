@@ -43,6 +43,7 @@
     basic_constraints: "CA:TRUE"
     authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}"
     authority_cert_serial_number: 1
+    create_subject_key_identifier: true
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   register: ca_csr
@@ -56,7 +57,8 @@
     provider: selfsigned
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
-
+  register: ca_pem
+# test custom certs -> validate AKI and SKI details.
 # each individual node needs its own priv key. this includes provisioner
 - name: generate private keys for nodes 
   community.crypto.openssl_privatekey:
@@ -111,13 +113,13 @@
   run_once: true
 
 - name: reload the node certs
-  uri: 
-    url: "http://{{ ansible_default_ipv4.address }}:8091/node/controller/reloadCertificates"
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:8091/node/controller/reloadCertificate"
     method: POST
     user: 'Administrator'
     password: '{{ couchbase_admin_pass }}'
     status_code: 200
-    body_format: json
-    body: 
-      name: 'Administrator'
-      password: '{{ couchbase_admin_pass }}'
+    force_basic_auth: true
+# each node reloads their own certs in sequence
+# "message": "Address specified in cert SAN part can't be verified.", "name": "cert_san_invalid", "severity": 2, "severityName": "minimal" 
+# the above is an expected error. cert reload DOES succeed. check with CB about correct SAN format.
