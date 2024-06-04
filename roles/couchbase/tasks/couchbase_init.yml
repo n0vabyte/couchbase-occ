@@ -1,0 +1,23 @@
+---
+- name: wait to avoid HTTPConnectionPool lockout
+  pause: 
+    seconds: 30
+# there is a built-in action to convert provisioner hostname from loopback to host ip when you add a second node to the cluster
+# minimum plan size = 8gb / g6-standard-4
+# 3 of data
+# 2 of index,query
+# 80% of memory in MiB
+- name: init the 8gb couchbase cluster
+  shell: |
+      /opt/couchbase/bin/couchbase-cli cluster-init \
+      --cluster 127.0.0.1 \
+      --cluster-ramsize {{ cb_mem }} \
+      --cluster-index-ramsize {{ cb_mem }} \
+      --cluster-username Administrator \
+      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --services data \
+      --index-storage-setting default \
+      --ip-family ipv4-only \
+      --node-to-node-encryption on
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"

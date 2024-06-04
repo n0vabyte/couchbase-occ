@@ -1,0 +1,41 @@
+---
+# copied from apps/linode_helpers/roles/certbot_ssl/tasks/certbot_standalone.yml
+- name: install python3-certbot
+  apt:
+    name: python3-certbot
+    state: present
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: set certbot plugin
+  set_fact:
+    certbot_plugin: standalone
+    cacheable: yes
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  
+# dry run
+- name: run dry-run for rdns
+  shell:
+    cmd: "certbot -n --standalone --agree-tos --dry-run --redirect certonly -d {{ rdns }} -m {{ email_address }}"
+  register: dry_run
+  until: dry_run is not failed
+  retries: 3
+  delay: 3
+  ignore_errors: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+# assert that we can get valid certs. Otherwise fail - can't achieve final state
+- name: validate certbot dry-run
+  assert:
+    that: dry_run is not failed
+    fail_msg: "[Error] Certbot dry-run domain. Please check /var/log/letsencrypt/letsencrypt.log"
+    success_msg: "[Info] Certbot dry-run successful!"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: installing let's encrypt certificate on rdns
+  shell:
+    cmd: "certbot -n --standalone --agree-tos --redirect certonly -d {{ rdns }} -m {{ email_address }}"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"

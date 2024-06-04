@@ -1,0 +1,34 @@
+server {
+    listen 80;
+    server_name {{ rdns }} www.{{ rdns }};
+    root           /var/www/{{ rdns }}/public_html;
+    location / {
+      try_files $uri $uri/ /index.php?$args =404;
+      include proxy_params;
+      proxy_pass   http://127.0.0.1:8091;
+    return 301 https://$host$request_uri;
+    }
+
+
+# Certbot SSL configuration
+    location ~ /.well-known/acme-challenge {
+        allow all;
+        root /var/www/{{ rdns }}/public_html ;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name {{ rdns }} www.{{ rdns }};
+    ssl_certificate /etc/letsencrypt/live/{{ rdns }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ rdns }}/privkey.pem;
+
+    root /var/www/{{ rdns }}/public_html;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8091;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+	}
+}

@@ -1,0 +1,59 @@
+---
+# nginx reverse proxy - ACME SSL - redirct from 8091
+# user / group for web files?
+# can the import_tasks in main be delegated to provisioner?
+- name: install nginx
+  apt: 
+    name: nginx
+    state: present
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: update default config file
+  template:
+    src: "templates/vhost_default.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ rdns }}"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: stop nginx to run certbot standalone
+  systemd:
+    name: nginx
+    state: stopped
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: run certbot standalone
+  import_tasks: certbot.yml 
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: vhost file
+  template:
+    src: "templates/vhost_ssl.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ rdns }}"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: create a symbolic link for the nginx configuration
+  file:
+    src: "/etc/nginx/sites-available/{{ rdns }}"
+    dest: "/etc/nginx/sites-enabled/{{ rdns }}"
+    state: link
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: unlink the default nginx configuration
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent 
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: restart nginx
+  systemd: 
+    name: nginx
+    state: started
+    enabled: true
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}" 

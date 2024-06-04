@@ -1,0 +1,32 @@
+---
+- name: add data nodes
+  shell: |
+      /opt/couchbase/bin/couchbase-cli server-add -c couchbase://{{ couchbase_data.server[0].instance.ip_pub1 }} \
+      --username Administrator \
+      --password {{ couchbase_admin_pass | quote }} \
+      --server-add https://{{ couchbase_data.server[1].instance.ip_pub1 }},https://{{ couchbase_data.server[2].instance.ip_pub1 }} \
+      --server-add-username Administrator \
+      --server-add-password {{ couchbase_admin_pass | quote }} \
+      --services data
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: add query and index nodes
+  shell: |
+      /opt/couchbase/bin/couchbase-cli server-add -c couchbase://{{ couchbase_data.server[0].instance.ip_pub1 }} \
+      --username Administrator \
+      --password {{ couchbase_admin_pass }} \
+      --server-add https://{{ couchbase_data.server[3].instance.ip_pub1 }},https://{{ couchbase_data.server[4].instance.ip_pub1 }} \
+      --server-add-username Administrator \
+      --server-add-password {{ couchbase_admin_pass | quote }} \
+      --services index,query
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: rebalance nodes
+  shell: |
+      /opt/couchbase/bin/couchbase-cli rebalance -c couchbase://{{ couchbase_data.server[0].instance.ip_pub1 }} \
+      --username Administrator \
+      --password {{ couchbase_admin_pass | quote }}
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
