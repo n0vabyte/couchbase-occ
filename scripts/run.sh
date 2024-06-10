@@ -82,7 +82,7 @@ function ansible:build {
   # sudo user
   sudo_username: ${SUDO_USERNAME}
   email_address: ${EMAIL_ADDRESS}
-  server_count: ${SERVERS}
+  server_count: ${CLUSTER_SIZE}
   # paths
 EOF
 }
