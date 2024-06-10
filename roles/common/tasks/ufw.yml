@@ -1,0 +1,45 @@
+---
+# allowed ports include all couchbase services for dynamic scaling
+# 1.2 include IP specific rules for intra-cluster
+- name: add ports
+  community.general.ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  loop:
+    - '4369'
+    - '8091:8097'
+    - '18091:18097'
+    - '9100:9105'
+    - '19102'
+    - '9110:9124'
+    - '9130'
+    - '19130'
+    - '9140'
+    - '9999'
+    - '11209'
+    - '11206'
+    - '11210'
+    - '11207'
+    - '11280'
+    - '21100'
+    - '21150'
+    - '21200'
+    - '21250'
+    - '21300'
+    - '21350'
+    - '22'
+    - '80'
+    - '443'
+
+- name: deny all others
+  community.general.ufw:
+    policy: deny
+    direction: incoming
+
+- name: restart ufw
+  systemd: 
+    name: ufw
+    state: restarted
+    enabled: true
+

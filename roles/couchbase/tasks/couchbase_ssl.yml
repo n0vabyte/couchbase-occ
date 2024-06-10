@@ -1,0 +1,135 @@
+---
+# generate tls certificates for couchbase cluster
+- name: alias couchbase ssl dir
+  set_fact: 
+    ssl_dir: '/opt/couchbase/var/lib/couchbase/inbox'
+
+- name: create ssl dirs
+  file: 
+    path: '{{ ssl_dir }}'
+    state: directory
+    owner: couchbase
+    group: couchbase
+
+- name: create CA dir
+  file: 
+    path: '{{ ssl_dir }}/CA'
+    state: directory
+    owner: couchbase
+    group: couchbase
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
+
+- name: generate ca passphrase
+  set_fact:
+    ca_password: "{{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits,punctuation') }}"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  no_log: true
+
+- name: generate private key for provisioner-cluster
+  community.crypto.openssl_privatekey_pipe:
+   passphrase: '{{ ca_password }}'
+   cipher: auto
+  register: ca_key
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+
+- name: generate csr for ca key
+  community.crypto.openssl_csr_pipe:
+    privatekey_passphrase: '{{ ca_password }}'
+    privatekey_content: '{{ ca_key.privatekey }}'
+    common_name: "Couchbase Root CA"
+    basic_constraints: "CA:TRUE"
+    authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}"
+    authority_cert_serial_number: 1
+    create_subject_key_identifier: true
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  register: ca_csr
+
+- name: generate cert for provisioner-cluster
+  community.crypto.x509_certificate:
+    path: '{{ ssl_dir }}/CA/ca.pem'
+    privatekey_passphrase: '{{ ca_password }}'
+    privatekey_content: '{{ ca_key.privatekey }}'
+    csr_content: '{{ ca_csr.csr }}'
+    provider: selfsigned
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
+  register: ca_pem
+# test custom certs -> validate AKI and SKI details.
+# each individual node needs its own priv key. this includes provisioner
+- name: generate private keys for nodes 
+  community.crypto.openssl_privatekey:
+   path: '{{ ssl_dir }}/pkey.key'
+
+- name: generate csr for nodes
+  community.crypto.openssl_csr:
+    path: '{{ ssl_dir }}/couchbase.csr'
+    privatekey_path: '{{ ssl_dir }}/pkey.key'
+    common_name: "Couchbase Server"
+    basic_constraints: "CA:FALSE"
+    create_subject_key_identifier: true
+    authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}" 
+    authority_cert_serial_number: 1
+    extended_key_usage: "serverAuth"
+    key_usage: 
+      - "digitalSignature"
+      - "keyEncipherment"  
+    subject_alt_name: "IP:{{ ansible_default_ipv4.address }}"
+
+- name: generate certs for nodes
+  community.crypto.x509_certificate:
+    path: '{{ ssl_dir }}/chain.pem'
+    privatekey_path: '{{ ssl_dir }}/pkey.key'
+    csr_path: '{{ ssl_dir }}/couchbase.csr'
+    ownca_content: "{{ lookup('ansible.builtin.file', '/opt/couchbase/var/lib/couchbase/inbox/CA/ca.pem') }}"
+    ownca_privatekey_content: "{{ ca_key.privatekey }}"
+    ownca_privatekey_passphrase: "{{ ca_password }}"
+    provider: ownca
+
+- name: chown certs
+  file: 
+    path: '{{ ssl_dir }}'
+    state: directory
+    recurse: true
+    owner: couchbase
+    group: couchbase
+    mode: 0700
+
+- name: reload the trusted keys 
+  uri: 
+    url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/node/controller/loadTrustedCAs"
+    method: POST
+    user: 'Administrator'
+    password: '{{ couchbase_admin_pass }}'
+    status_code: 200
+    body_format: json
+    body: 
+      name: 'Administrator'
+      password: '{{ couchbase_admin_pass }}'    
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
+
+- name: reload the node certs
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:8091/node/controller/reloadCertificate"
+    method: POST
+    user: 'Administrator'
+    password: '{{ couchbase_admin_pass }}'
+    status_code: 200
+    force_basic_auth: true
+# each node reloads their own certs in sequence
+# "message": "Address specified in cert SAN part can't be verified.", "name": "cert_san_invalid", "severity": 2, "severityName": "minimal" 
+# the above is an expected error. cert reload DOES succeed. check with CB about correct SAN format.
+- name: remove the generated self-signed CA
+  uri:
+    url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/pools/default/trustedCAs/0"
+    method: DELETE
+    user: 'Administrator'
+    password: '{{ couchbase_admin_pass }}'
+    status_code: 204
+    force_basic_auth: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
