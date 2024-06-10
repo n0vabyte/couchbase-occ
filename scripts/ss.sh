@@ -7,7 +7,7 @@ trap "cleanup $? $LINENO" EXIT
 # <UDF name="sudo_username" label="The limited sudo user to be created in the cluster" />
 # <UDF name="email_address" label="Email Address" example="Example: user@domain.tld" />
 # <UDF name="clusterheader" label="Cluster Settings" default="Yes" header="Yes">
-# <UDF name="servers" label="Couchbase Server count" default="5" oneOf="5" />
+# <UDF name="cluster_size" label="Couchbase Server count" default="5" oneOf="5" />
 
 # git repo
 git_username="akamai-compute-marketplace"

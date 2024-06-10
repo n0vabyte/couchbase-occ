@@ -47,7 +47,7 @@ curl -H "Content-Type: application/json" \
         "token_password": "${TOKEN}"
         "sudo_username": "${SUDO_USERNAME}"
         "email_address": "${EMAIL_ADDRESS}"
-        "servers": "5"
+        "cluster_size": "5"
       },
       "authorized_users": [
         "myUser",
@@ -73,7 +73,7 @@ linode-cli linodes create \
   --root_pass ${ROOT_PASS} \
   --booted true \
   --stackscript_id 1366191 \
-  --stackscript_data '{"token_password": "${TOKEN}","sudo_username": "${SUDO_USERNAME}","email_address": "${EMAIL_ADDRESS}","servers": "5"} \
+  --stackscript_data '{"token_password": "${TOKEN}","sudo_username": "${SUDO_USERNAME}","email_address": "${EMAIL_ADDRESS}","cluster_size": "5"} \
   --region us-mia \
   --type g6-standard-4 \
   --authorized_users "myUser"
