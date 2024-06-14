@@ -1,6 +1,6 @@
 ---
 # destroy linodes
-- Name: Destroying Linodes
+- name: Destroying Linodes
   hosts: localhost
   connection: local
   vars_files:
