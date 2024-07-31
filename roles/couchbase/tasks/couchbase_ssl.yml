@@ -1,11 +1,11 @@
 ---
 # generate tls certificates for couchbase cluster
 - name: alias couchbase ssl dir
-  set_fact: 
+  set_fact:
     ssl_dir: '/opt/couchbase/var/lib/couchbase/inbox'
 
 - name: create ssl dirs
-  file: 
+  file:
     path: '{{ ssl_dir }}'
     state: directory
     owner: couchbase
@@ -17,6 +17,7 @@
     state: directory
     owner: couchbase
     group: couchbase
+    mode: 0755
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
 
@@ -29,8 +30,8 @@
 
 - name: generate private key for provisioner-cluster
   community.crypto.openssl_privatekey_pipe:
-   passphrase: '{{ ca_password }}'
-   cipher: auto
+    passphrase: '{{ ca_password }}'
+    cipher: auto
   register: ca_key
   run_once: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
@@ -39,8 +40,14 @@
   community.crypto.openssl_csr_pipe:
     privatekey_passphrase: '{{ ca_password }}'
     privatekey_content: '{{ ca_key.privatekey }}'
-    common_name: "Couchbase Root CA"
+    country_name: '{{ country_name }}'
+    state_or_province_name: '{{ state_or_province_name }}'
+    locality_name: '{{ locality_name }}'
+    organization_name: '{{ organization_name }}'
+    common_name: '{{ ca_common_name }}'
+    subject: "CN={{ ca_common_name }}"
     basic_constraints: "CA:TRUE"
+    basic_constraints_critical: true
     authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}"
     authority_cert_serial_number: 1
     create_subject_key_identifier: true
@@ -62,7 +69,7 @@
 # each individual node needs its own priv key. this includes provisioner
 - name: generate private keys for nodes 
   community.crypto.openssl_privatekey:
-   path: '{{ ssl_dir }}/pkey.key'
+    path: '{{ ssl_dir }}/pkey.key'
 
 - name: generate csr for nodes
   community.crypto.openssl_csr:
@@ -70,13 +77,13 @@
     privatekey_path: '{{ ssl_dir }}/pkey.key'
     common_name: "Couchbase Server"
     basic_constraints: "CA:FALSE"
-    create_subject_key_identifier: true
-    authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}" 
+    authority_key_identifier: '{{ ca.pem.subject_key_identifier }}'
+    authority_cert_issuer: "IP:{{ couchbase_data.server[0].instance.ip_pub1 }}"
     authority_cert_serial_number: 1
     extended_key_usage: "serverAuth"
-    key_usage: 
+    key_usage:
       - "digitalSignature"
-      - "keyEncipherment"  
+      - "keyEncipherment"
     subject_alt_name: "IP:{{ ansible_default_ipv4.address }}"
 
 - name: generate certs for nodes
@@ -90,7 +97,7 @@
     provider: ownca
 
 - name: chown certs
-  file: 
+  file:
     path: '{{ ssl_dir }}'
     state: directory
     recurse: true
@@ -99,16 +106,16 @@
     mode: 0700
 
 - name: reload the trusted keys 
-  uri: 
+  uri:
     url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/node/controller/loadTrustedCAs"
     method: POST
     user: 'Administrator'
     password: '{{ couchbase_admin_pass }}'
     status_code: 200
     body_format: json
-    body: 
+    body:
       name: 'Administrator'
-      password: '{{ couchbase_admin_pass }}'    
+      password: '{{ couchbase_admin_pass }}'
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
 

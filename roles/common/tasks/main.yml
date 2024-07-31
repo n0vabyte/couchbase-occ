@@ -1,7 +1,7 @@
 ---
 # vm configs
 - name: disable THP
-  template: 
+  copy: 
     src: templates/disable-thp.service.j2
     dest: /etc/systemd/system/disable-thp.service
 
@@ -72,4 +72,4 @@
   notify: restart ssh
 
 - name: add couchbase ports to ufw
-  import_tasks: ufw.yml
+  include_tasks: ufw.yml

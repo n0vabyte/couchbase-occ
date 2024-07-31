@@ -1,14 +1,23 @@
 #!/bin/bash
 set -e
-trap "cleanup $? $LINENO" EXIT
+DEBUG="NO"
+if [ "${DEBUG}" == "NO" ]; then
+  trap "cleanup $? $LINENO" EXIT
+fi
 
 ## Deployment Variables
 # <UDF name="token_password" label="Your Linode API token" />
 # <UDF name="sudo_username" label="The limited sudo user to be created in the cluster" />
-# <UDF name="email_address" label="Email Address" example="Example: user@domain.tld" />
+# <UDF name="email_address" label="Email Address for CA and Let's Encrypt certificats" example="Example: user@domain.tld" />
 # <UDF name="clusterheader" label="Cluster Settings" default="Yes" header="Yes">
 # <UDF name="cluster_size" label="Couchbase Server count" default="5" oneOf="5" />
-
+## ssl variables
+# <UDF name="sslheader" label="SSL Information" header="Yes" default="Yes" required="Yes">
+# <UDF name="country_name" label="Details for self-signed SSL certificates: Country or Region" oneof="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AX,AZ,BA,BB,BD,BE,BF,BG,BH,BI,BJ,BL,BM,BN,BO,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CU,CV,CW,CX,CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IM,IN,IO,IQ,IR,IS,IT,JE,JM,JO,JP,KE,KG,KH,KI,KM,KN,KP,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MF,MG,MH,MK,ML,MM,MN,MO,MP,MQ,MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SD,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,SS,ST,SV,SX,SY,SZ,TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,WF,WS,YE,YT,ZA,ZM,ZW" />
+# <UDF name="state_or_province_name" label="State or Province" example="Example: Pennsylvania" />
+# <UDF name="locality_name" label="Locality" example="Example: Philadelphia" />
+# <UDF name="organization_name" label="Organization" example="Example: Akamai Technologies"  />
+# <UDF name="ca_common_name" label="CA Common Name" default="Couchbase CA" />
 # git repo
 git_username="akamai-compute-marketplace"
 export GIT_REPO="https://github.com/$git_username/couchbase-occ.git"
@@ -24,7 +33,7 @@ function cleanup {
     if [ -d "/tmp/linode" ]; then
       rm -rf /tmp/linode
     fi
-    if [ -d "/usr/local/bin/run" ]; then
+    if [ -f "/usr/local/bin/run" ]; then
       rm /usr/local/bin/run
     fi
     stackscript_cleanup
@@ -69,16 +78,6 @@ function rename_provisioner {
       https://api.linode.com/v4/linode/instances/${LINODE_ID}
 }
 
-function tag_provisioner {
-  echo "[info] tagging the provisioner"
-  REGION=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .region)
-  export REGION="${REGION}"
-  curl -s -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TOKEN_PASSWORD}" -X PUT \
-    -d "{\"tags\": [\"${UUID}-${REGION}\"]}" \ \
-    https://api.linode.com/v4/linode/instances/${LINODE_ID}   
-}
-
 function setup {
   # install dependencies
   export DEBIAN_FRONTEND=non-interactive
@@ -86,7 +85,6 @@ function setup {
   apt-get install -y jq git python3 python3-pip python3-dev build-essential
   # add private IP address
   rename_provisioner
-  tag_provisioner
   configure_privateip  
   # write authorized_keys file
   if [ "${ADD_SSH_KEYS}" == "yes" ]; then

@@ -9,7 +9,6 @@
     local_home: "{{ lookup('env','HOME') }}"
   vars_files: 
     - group_vars/couchbase/vars
-    - group_vars/couchbase/secret_vars
   gather_facts: true
 
   roles:

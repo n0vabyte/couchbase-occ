@@ -1,13 +1,17 @@
 ---
 # roles/post/tasks/main.yml
 - name: add nginx reverse proxy for webui
-  import_tasks: nginx.yml
+  include_tasks: nginx.yml
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
 
 - name: adding sudo user
-  import_tasks: sudouser.yml
+  include_tasks: sudouser.yml
 
 - name: add user ssh keys
-  import_tasks: sshkeys.yml
+  include_tasks: sshkeys.yml
 
 - name: dumping credentials locally
-  import_tasks: creds.yml
+  include_tasks: creds.yml
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
