@@ -19,8 +19,7 @@ fi
 # <UDF name="organization_name" label="Organization" example="Example: Akamai Technologies"  />
 # <UDF name="ca_common_name" label="CA Common Name" default="Couchbase CA" />
 # git repo
-git_username="akamai-compute-marketplace"
-export GIT_REPO="https://github.com/$git_username/couchbase-occ.git"
+export GIT_REPO="https://github.com/akamai-compute-marketplace/couchbase-occ.git"
 export DEBIAN_FRONTEND=non-interactive
 export UUID=$(uuidgen | awk -F - '{print $1}')
 

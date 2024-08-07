@@ -52,7 +52,7 @@ function verify {
 
 # production
 function ansible:build {
-  local ROOT_PASS=$(sudo cat /etc/shadow | grep root)
+  local TMP_ROOT_PASS=$(openssl rand -base64 32)
   local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
   local TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
   local COUCHBASE_ADMIN_PASS=$(openssl rand -base64 32)
@@ -71,7 +71,7 @@ function ansible:build {
   uuid: ${UUID}
   webserver_stack: standalone
   rdns: ${RDNS}
-  root_pass: ${ROOT_PASS}
+  root_pass: ${TMP_ROOT_PASS}
   server_count: ${CLUSTER_SIZE}
   
   # user vars
@@ -90,15 +90,14 @@ EOF
 
 function ansible:deploy {
   ansible-playbook -v provision.yml
-  ansible-playbook -i hosts site.yml -v --extra-vars "root_password=${ROOT_PASS}"
+  ansible-playbook -i hosts site.yml -v --extra-vars "root_password=${TMP_ROOT_PASS}"
 }
 
 function test:deploy {
   export DISTRO="${1}"
   export DATE="$(date '+%Y-%m-%d-%H%M%S')"
   ansible-playbook provision.yml --extra-vars "ssh_keys=${HOME}/.ssh/id_ansible_ed25519.pub instance_prefix=${DISTRO}-${DATE} image=linode/${DISTRO}"
-  ansible-playbook -i hosts site.yml --extra-vars "root_password=${ROOT_PASS}"
-  verify
+  ansible-playbook -i hosts site.yml --extra-vars "root_password=${TMP_ROOT_PASS}"
 }
 
 # main
