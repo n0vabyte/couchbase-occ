@@ -4,7 +4,6 @@
   connection: local
   vars_files:
     - group_vars/couchbase/vars
-    - group_vars/couchbase/secret_vars
 
   tasks: 
   - name: set couchbase memory
@@ -28,9 +27,9 @@
       root_pass: '{{ root_pass }}'
       authorized_keys: '{{ ssh_keys }}'
       private_ip: true
-      stackscript_id: 1366193
-      ua_prefix: 'marketplace-couchbase-occ'
-      tags: '{{ cluster_uuid }}'
+# unlink from prod stackscript_id during testing
+#      stackscript_id: 1366193
+#      ua_prefix: 'marketplace-couchbase-occ'
       state: present
     with_sequence: count='{{ server_count - 1 }}'
 
