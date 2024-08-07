@@ -9,7 +9,7 @@
 
 - name: move couchbase-server file for ufw
   copy:
-    source: "../files/couchbase_server"
+    src: 'files/couchbase_server'
     dest: "/etc/ufw/applications.d/couchbase-server"
     owner: root
     group: root
@@ -18,9 +18,9 @@
   community.general.ufw:
     rule: allow
     name: "couchbase-server"
-    from: '{{ item }}'
+    from: "{{ couchbase_data.server[count].instance.ip_pub1 }}"
     proto: tcp
-  loop: '{{ couchbase_data.server[count].instance.ip_pub1 }}'
+  loop: "{{ groups['couchbase_cluster'] }}"
   loop_control:
     index_var: count
 
