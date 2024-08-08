@@ -53,6 +53,7 @@ function verify {
 # production
 function ansible:build {
   local TMP_ROOT_PASS=$(openssl rand -base64 32)
+  local USER_ROOT_PASS=$(sudo cat /etc/shadow | grep root)
   local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
   local TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
   local COUCHBASE_ADMIN_PASS=$(openssl rand -base64 32)
@@ -61,6 +62,7 @@ function ansible:build {
   sed 's/  //g' <<EOF > ${VARS_PATH}
   # account vars
   api_token: ${TOKEN_PASSWORD}
+  user_root_pass: ${USER_ROOT_PASS}
   
   # cluster vars
   ssh_keys: ${ANSIBLE_SSH_PUB_KEY}

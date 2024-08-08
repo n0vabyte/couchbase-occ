@@ -10,21 +10,21 @@
 - name: copy ufw file couchbase node
   copy:
     src: 'files/couchbase_server_node'
-    dest: "/etc/ufw/applications.d/node-couchbase"
+    dest: "/etc/ufw/applications.d/couchbase-node"
     owner: root
     group: root
 
 - name: copy ufw file couchbase pub
   copy:
     src: 'files/couchbase_server_pub'
-    dest: "/etc/ufw/applications.d/pub-couchbase"
+    dest: "/etc/ufw/applications.d/couchbase-pub"
     owner: root
     group: root
 
 - name: copy ufw file couchbase client
   copy:
     src: 'files/couchbase_server_client'
-    dest: "/etc/ufw/applications.d/client-couchbase"
+    dest: "/etc/ufw/applications.d/couchbase-client"
     owner: root
     group: root
 
@@ -42,6 +42,7 @@
     rule: allow
     name: "couchbase-pub"
     interface: eth0
+# should this be disabled but present for end-user?
 
 - name: allow client ports on provisioner
   community.general.ufw:
