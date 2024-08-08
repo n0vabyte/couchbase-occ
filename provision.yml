@@ -23,15 +23,14 @@
         The user already exist on the system. Please redeploy the Marketplace app using a non-system user for the sudo user value.
         Do not use the following users,
         {{ system_users }}
-    when: "sudo_username in system_users
+    when: "sudo_username in system_users or sudo_username == 'couchbase'"
 
-  # generate playbook secrets
   - name: generating playbook secrets
     lineinfile:
       insertafter: EOF
       path: group_vars/couchbase/vars
       line: |
-        ca_password: "{{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}"
+        ca_password: {{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}
         sudo_password: {{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}
         couchbase_admin_password: {{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}
     no_log: true
