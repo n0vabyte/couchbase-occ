@@ -9,7 +9,7 @@
 
 - name: checking account keys
   stat:
-    path: '{{ local_home}}/.ssh/authorized_keys'
+    path: '{{ local_home }}/.ssh/authorized_keys'
   register: authorized_keys_file
 
 - name: adding account keys to sudo user

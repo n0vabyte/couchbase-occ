@@ -18,7 +18,7 @@
     state: stopped
 
 - name: run certbot standalone
-  import_tasks: certbot.yml 
+  import_tasks: certbot.yml
 
 - name: vhost file
   template:
