@@ -14,7 +14,7 @@
       --cluster-ramsize {{ cb_mem }} \
       --cluster-index-ramsize {{ cb_mem }} \
       --cluster-username Administrator \
-      --cluster-password {{ couchbase_admin_pass | quote }} \
+      --cluster-password {{ couchbase_admin_password | quote }} \
       --services data \
       --index-storage-setting default \
       --ip-family ipv4-only \

@@ -1,19 +1,11 @@
 ---
 # roles/post/tasks/sudouser.yml
-
-- name: generate sudo user password
-  set_fact:
-    sudo_username_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits,punctuation') }}"
-  run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
-  no_log: true
-
 - name: create sudo user
   user:
     name: "{{ sudo_username }}"
     shell: /bin/bash
     groups: sudo
-    password: "{{ sudo_username_pass | password_hash('sha512') }}"
+    password: "{{ sudo_password | password_hash('sha512') }}"
     update_password: on_create
     expires: -1
     append: yes

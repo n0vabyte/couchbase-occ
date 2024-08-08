@@ -1,11 +1,25 @@
+---
 # roles/post/tasks/sshkeys.yml
+# add root password and keys to cluster nodes
+- name: get root password
+  slurp:
+    src: "/etc/shadow"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  register: shadow
+
+- name: set root password
+  set_fact:
+    root_password: "{{ shadow['content'] | b64decode | regex_search('^root.+') }}"
+  run_once: true
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
 
 # set account passwords
 - name: set root password on remote nodes
   lineinfile:
     path: /etc/shadow
     regexp: '^root.+'
-    line: '{{ user_root_password }}'
+    line: '{{ root_password }}'
 
 - name: checking account keys
   stat:

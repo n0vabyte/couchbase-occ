@@ -21,13 +21,6 @@
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
 
-- name: generate ca passphrase
-  set_fact:
-    ca_password: "{{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits,punctuation') }}"
-  run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
-  no_log: true
-
 - name: generate private key for provisioner-cluster
   community.crypto.openssl_privatekey_pipe:
     passphrase: '{{ ca_password }}'
@@ -110,12 +103,12 @@
     url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/node/controller/loadTrustedCAs"
     method: POST
     user: 'Administrator'
-    password: '{{ couchbase_admin_pass }}'
+    password: '{{ couchbase_admin_password }}'
     status_code: 200
     body_format: json
     body:
       name: 'Administrator'
-      password: '{{ couchbase_admin_pass }}'
+      password: '{{ couchbase_admin_password }}'
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
 
@@ -124,7 +117,7 @@
     url: "http://{{ ansible_default_ipv4.address }}:8091/node/controller/reloadCertificate"
     method: POST
     user: 'Administrator'
-    password: '{{ couchbase_admin_pass }}'
+    password: '{{ couchbase_admin_password }}'
     status_code: 200
     force_basic_auth: true
 # each node reloads their own certs in sequence
@@ -135,7 +128,7 @@
     url: "http://{{ couchbase_data.server[0].instance.ip_pub1 }}:8091/pools/default/trustedCAs/0"
     method: DELETE
     user: 'Administrator'
-    password: '{{ couchbase_admin_pass }}'
+    password: '{{ couchbase_admin_password }}'
     status_code: 204
     force_basic_auth: true
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
