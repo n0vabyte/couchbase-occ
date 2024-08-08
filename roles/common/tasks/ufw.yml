@@ -10,28 +10,28 @@
 - name: copy ufw file couchbase node
   copy:
     src: 'files/couchbase_server_node'
-    dest: "/etc/ufw/applications.d/couchbase-server-node"
+    dest: "/etc/ufw/applications.d/node-couchbase"
     owner: root
     group: root
 
 - name: copy ufw file couchbase pub
   copy:
     src: 'files/couchbase_server_pub'
-    dest: "/etc/ufw/applications.d/couchbase-server-pub"
+    dest: "/etc/ufw/applications.d/pub-couchbase"
     owner: root
     group: root
 
 - name: copy ufw file couchbase client
   copy:
     src: 'files/couchbase_server_client'
-    dest: "/etc/ufw/applications.d/couchbase-server-client"
+    dest: "/etc/ufw/applications.d/client-couchbase"
     owner: root
     group: root
 
 - name: allow node to node ports
   community.general.ufw:
     rule: allow
-    name: "couchbase-server-node"
+    name: "node-couchbase"
     from: "{{ couchbase_data.server[count].instance.ip_priv1 }}"
   loop: "{{ groups['couchbase_cluster'] }}"
   loop_control:
@@ -40,13 +40,13 @@
 - name: allow cluster to cluster ports
   community.general.ufw:
     rule: allow
-    name: "couchbase-server-pub"
+    name: "pub-couchbase"
     interface: eth0
 
 - name: allow client ports on provisioner
   community.general.ufw:
     rule: allow
-    name: "couchbase-server-client"
+    name: "client-couchbase"
     interface: eth0
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
