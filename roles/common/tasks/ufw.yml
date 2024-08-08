@@ -7,22 +7,49 @@
     port: '22'
     proto: tcp
 
-- name: move couchbase-server file for ufw
+- name: copy ufw file couchbase node
   copy:
-    src: 'files/couchbase_server'
-    dest: "/etc/ufw/applications.d/couchbase-server"
+    src: 'files/couchbase_server_node'
+    dest: "/etc/ufw/applications.d/couchbase-server-node"
     owner: root
     group: root
 
-- name: allow couchbase to couchbase ports
+- name: copy ufw file couchbase pub
+  copy:
+    src: 'files/couchbase_server_pub'
+    dest: "/etc/ufw/applications.d/couchbase-server-pub"
+    owner: root
+    group: root
+
+- name: copy ufw file couchbase client
+  copy:
+    src: 'files/couchbase_server_client'
+    dest: "/etc/ufw/applications.d/couchbase-server-client"
+    owner: root
+    group: root
+
+- name: allow node to node ports
   community.general.ufw:
     rule: allow
-    name: "couchbase-server"
-    from: "{{ couchbase_data.server[count].instance.ip_pub1 }}"
-    proto: tcp
+    name: "couchbase-server-node"
+    from: "{{ couchbase_data.server[count].instance.ip_priv1 }}"
   loop: "{{ groups['couchbase_cluster'] }}"
   loop_control:
     index_var: count
+
+- name: allow cluster to cluster ports
+  community.general.ufw:
+    rule: allow
+    name: "couchbase-server-pub"
+    interface: eth0
+
+- name: allow client ports on provisioner
+  community.general.ufw:
+    rule: allow
+    name: "couchbase-server-client"
+    interface: eth0
+  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  run_once: true
 
 - name: allow web ports on provisioner
   community.general.ufw:
