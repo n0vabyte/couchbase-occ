@@ -31,7 +31,7 @@
 - name: allow node to node ports
   community.general.ufw:
     rule: allow
-    name: "node-couchbase"
+    name: "couchbase-node"
     from: "{{ couchbase_data.server[count].instance.ip_priv1 }}"
   loop: "{{ groups['couchbase_cluster'] }}"
   loop_control:
@@ -40,13 +40,13 @@
 - name: allow cluster to cluster ports
   community.general.ufw:
     rule: allow
-    name: "pub-couchbase"
+    name: "couchbase-pub"
     interface: eth0
 
 - name: allow client ports on provisioner
   community.general.ufw:
     rule: allow
-    name: "client-couchbase"
+    name: "couchbase-client"
     interface: eth0
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true

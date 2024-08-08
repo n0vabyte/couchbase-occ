@@ -1,4 +1,4 @@
-[couchbase-server]
+[couchbase-pub]
 title=Couchbase Server cluster-to-cluster
 description=Couchbase public IP ports
-ports=8091,8092,11210,11207,18091,18092/tcp
+ports=8091|8092|11210|11207|18091|18092/tcp

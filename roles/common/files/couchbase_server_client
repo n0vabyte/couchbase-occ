@@ -1,4 +1,4 @@
-[couchbase-server]
+[couchbase-client]
 title=Couchbase Server client ports
 description=Couchbase provisioner only ports
-ports=8091:8097,9123,11210,11580,11207,18091:18095,18096,18097/tcp
+ports=8091:8097|9123|11210|11580|11207|18091:18095|18096|18097/tcp
