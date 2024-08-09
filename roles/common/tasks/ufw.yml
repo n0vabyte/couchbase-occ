@@ -41,14 +41,16 @@
   community.general.ufw:
     rule: allow
     name: "couchbase-pub"
-    interface: eth0
+    interface_in: eth0 
+    interface_out: eth0
 # should this be disabled but present for end-user?
 
 - name: allow client ports on provisioner
   community.general.ufw:
     rule: allow
     name: "couchbase-client"
-    interface: eth0
+    interface_in: eth0
+    interface_out: eth0
   delegate_to: "{{ groups['couchbase_cluster'][0] }}"
   run_once: true
 
