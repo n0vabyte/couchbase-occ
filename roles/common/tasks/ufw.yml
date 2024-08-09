@@ -41,7 +41,20 @@
   community.general.ufw:
     rule: allow
     name: "couchbase-pub"
+    from: "{{ couchbase_data.server[count].instance.ip_pub1}}"
+  loop: "{{ groups['couchbase_cluster'] }}"
+  loop_control:
+    index_var: count
 # should this be disabled but present for end-user?
+
+- name: allow cluster to cluster ports
+  community.general.ufw:
+    rule: allow
+    name: "couchbase-pub"
+    from: "{{ couchbase_data.server[count].instance.ip_priv1}}"
+  loop: "{{ groups['couchbase_cluster'] }}"
+  loop_control:
+    index_var: count
 
 - name: allow client + web ports on provisioner
   community.general.ufw:
