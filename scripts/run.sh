@@ -54,7 +54,7 @@ function verify {
 function ansible:build {
   local TEMP_ROOT_PASS=$(openssl rand -base64 32)
   local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
-  local TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
+  local INSTANCE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
   ssh_key
   # write vars file
   sed 's/  //g' <<EOF > ${VARS_PATH}
@@ -63,10 +63,10 @@ function ansible:build {
   # cluster vars
   ssh_keys: ${ANSIBLE_SSH_PUB_KEY}
   instance_prefix: ${INSTANCE_PREFIX}
+  instance_tags: ${INSTANCE_TAGS}
   type: ${LINODE_PARAMS[0]}
   region: ${LINODE_PARAMS[1]}
   image: ${LINODE_PARAMS[2]}
-  tags: ${TAGS}
   uuid: ${UUID}
   webserver_stack: standalone
   rdns: ${RDNS}

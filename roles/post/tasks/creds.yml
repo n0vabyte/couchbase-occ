@@ -11,7 +11,7 @@
     block: |
       # System User 
       Sudo User: {{ sudo_username }}
-      Password: {{ sudo_username_password }}
+      Password: {{ sudo_password }}
       
       # Couchbase Server User
       Administrator: {{ couchbase_admin_password }}
