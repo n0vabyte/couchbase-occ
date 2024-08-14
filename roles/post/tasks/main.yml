@@ -2,7 +2,7 @@
 # roles/post/tasks/main.yml
 - name: add nginx reverse proxy for webui
   import_tasks: nginx.yml
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
 
 - name: adding sudo user
@@ -10,7 +10,7 @@
 
 - name: dumping credentials locally
   import_tasks: creds.yml
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
 
 - name: add user ssh keys

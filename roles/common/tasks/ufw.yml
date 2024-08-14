@@ -60,7 +60,7 @@
   community.general.ufw:
     rule: allow
     name: "couchbase-client"
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
 
 - name: deny all others

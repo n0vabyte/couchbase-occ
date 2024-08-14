@@ -73,3 +73,16 @@
 
 - name: add couchbase ports to ufw
   include_tasks: ufw.yml
+
+- name: create DNS records for NGINX 
+  import_tasks: create_dns_records.yml
+  run_once: true
+  delegate_to: localhost
+  when:
+    - domain is defined
+
+- name: set dns fact for default rdns
+  set_fact:
+    _domain: '{{ default_dns }}'
+    cacheable: true
+  when: domain is not defined

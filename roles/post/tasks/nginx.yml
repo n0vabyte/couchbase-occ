@@ -10,7 +10,7 @@
 - name: update default config file
   template:
     src: "templates/vhost_default.conf.j2"
-    dest: "/etc/nginx/sites-available/{{ rdns }}"
+    dest: "/etc/nginx/sites-available/{{ _domain }}"
 
 - name: stop nginx to run certbot standalone
   systemd:
@@ -23,12 +23,12 @@
 - name: vhost file
   template:
     src: "templates/vhost_ssl.conf.j2"
-    dest: "/etc/nginx/sites-available/{{ rdns }}"
+    dest: "/etc/nginx/sites-available/{{ _domain }}"
 
 - name: create a symbolic link for the nginx configuration
   file:
-    src: "/etc/nginx/sites-available/{{ rdns }}"
-    dest: "/etc/nginx/sites-enabled/{{ rdns }}"
+    src: "/etc/nginx/sites-available/{{ _domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ _domain }}"
     state: link
 
 - name: unlink the default nginx configuration

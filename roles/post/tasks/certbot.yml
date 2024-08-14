@@ -11,9 +11,9 @@
     cacheable: yes
   
 # dry run
-- name: run dry-run for rdns
+- name: run dry-run for domain
   shell:
-    cmd: "certbot -n --standalone --agree-tos --dry-run --redirect certonly -d {{ rdns }} -m {{ email_address }}"
+    cmd: "certbot -n --standalone --agree-tos --dry-run --redirect certonly -d {{ _domain }} -m {{ email_address }}"
   register: dry_run
   until: dry_run is not failed
   retries: 3
@@ -27,6 +27,6 @@
     fail_msg: "[Error] Certbot dry-run domain. Please check /var/log/letsencrypt/letsencrypt.log"
     success_msg: "[Info] Certbot dry-run successful!"
 
-- name: installing let's encrypt certificate on rdns
+- name: installing let's encrypt certificate on provisioner
   shell:
-    cmd: "certbot -n --standalone --agree-tos --redirect certonly -d {{ rdns }} -m {{ email_address }}"
+    cmd: "certbot -n --standalone --agree-tos --redirect certonly -d {{ _domain }} -m {{ email_address }}"

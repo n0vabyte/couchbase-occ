@@ -20,4 +20,4 @@
       --ip-family ipv4-only \
       --node-to-node-encryption on
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost

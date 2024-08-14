@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-DEBUG="yes"
+DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
@@ -8,7 +8,7 @@ fi
 ## Deployment Variables
 # <UDF name="token_password" label="Your Linode API token" />
 # <UDF name="sudo_username" label="The limited sudo user to be created in the cluster" />
-# <UDF name="email_address" label="Email Address for CA and Let's Encrypt certificats" example="Example: user@domain.tld" />
+# <UDF name="email_address" label="Email Address for CA and Let's Encrypt certificates" example="Example: user@domain.tld" />
 # <UDF name="clusterheader" label="Cluster Settings" default="Yes" header="Yes">
 # <UDF name="cluster_size" label="Couchbase Server count" default="3" oneOf="3,5,7" />
 ## ssl variables
@@ -18,6 +18,9 @@ fi
 # <UDF name="locality_name" label="Locality" example="Example: Philadelphia" />
 # <UDF name="organization_name" label="Organization" example="Example: Akamai Technologies"  />
 # <UDF name="ca_common_name" label="CA Common Name" default="Couchbase CA" />
+## NGINX variables
+# <UDF name="domain" label="Domain address for HTTPS reverse proxy" example="fqdn.tld"  />
+# <UDF name="subdomain" label="Subdomain address for HTTPS reverse proxy" default="www"  />
 # git repo
 export GIT_REPO="https://github.com/akamai-compute-marketplace/couchbase-occ.git"
 export DEBIAN_FRONTEND=non-interactive

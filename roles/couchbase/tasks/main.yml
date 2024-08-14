@@ -5,7 +5,7 @@
 - name: configure couchbase 
   include_tasks: couchbase_init.yml
 
-- name: add couchbase couchbase servers
+- name: add couchbase servers
   include_tasks: couchbase_add.yml
 
 - name: create couchbase certs

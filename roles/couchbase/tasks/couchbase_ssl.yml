@@ -18,7 +18,7 @@
     owner: couchbase
     group: couchbase
     mode: 0755
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
 
 - name: generate private key for provisioner-cluster
@@ -27,7 +27,7 @@
     cipher: auto
   register: ca_key
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
 
 - name: generate csr for ca key
   community.crypto.openssl_csr_pipe:
@@ -44,7 +44,7 @@
     authority_cert_serial_number: 1
     create_subject_key_identifier: true
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   register: ca_csr
 
 - name: generate cert for provisioner-cluster
@@ -54,7 +54,7 @@
     privatekey_content: '{{ ca_key.privatekey }}'
     csr_content: '{{ ca_csr.csr }}'
     provider: selfsigned
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
   register: ca_pem
 # test custom certs -> validate AKI and SKI details.
@@ -112,7 +112,7 @@
     body:
       name: 'Administrator'
       password: '{{ couchbase_admin_password }}'
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true
 
 - name: reload the node certs
@@ -135,5 +135,5 @@
     password: '{{ couchbase_admin_password }}'
     status_code: 204
     force_basic_auth: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   run_once: true

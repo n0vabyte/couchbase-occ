@@ -1,7 +1,7 @@
 server {
     listen 80;
-    server_name {{ rdns }} www.{{ rdns }};
-    root           /var/www/{{ rdns }}/public_html;
+    server_name {{ _domain }} www.{{ _domain }};
+    root           /var/www/{{ _domain }}/public_html;
     location / {
       try_files $uri $uri/ /index.php?$args =404;
       include proxy_params;
@@ -13,17 +13,17 @@ server {
 # Certbot SSL configuration
     location ~ /.well-known/acme-challenge {
         allow all;
-        root /var/www/{{ rdns }}/public_html ;
+        root /var/www/{{ _domain }}/public_html ;
     }
 }
 
 server {
     listen 443 ssl;
-    server_name {{ rdns }} www.{{ rdns }};
-    ssl_certificate /etc/letsencrypt/live/{{ rdns }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ rdns }}/privkey.pem;
+    server_name {{ _domain }} www.{{ _domain }};
+    ssl_certificate /etc/letsencrypt/live/{{ _domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ _domain }}/privkey.pem;
 
-    root /var/www/{{ rdns }}/public_html;
+    root /var/www/{{ _domain }}/public_html;
 
     location / {
         include proxy_params;

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-DEBUG="yes"
+DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
@@ -15,7 +15,6 @@ function cleanup {
 }
 
 # constants
-readonly RDNS=$(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})
 readonly VARS_PATH="./group_vars/couchbase/vars"
 
 # utility functions
@@ -54,6 +53,7 @@ function verify {
 function ansible:build {
   local TEMP_ROOT_PASS=$(openssl rand -base64 32)
   local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
+  local LINODE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
   ssh_key
   # write vars file
   sed 's/  //g' <<EOF > ${VARS_PATH}
@@ -65,9 +65,9 @@ function ansible:build {
   type: ${LINODE_PARAMS[0]}
   region: ${LINODE_PARAMS[1]}
   image: ${LINODE_PARAMS[2]}
+  linode_tags: ${LINODE_TAGS}
   uuid: ${UUID}
   webserver_stack: standalone
-  rdns: ${RDNS}
   root_pass: ${TEMP_ROOT_PASS}
   server_count: ${CLUSTER_SIZE}
   # user vars
@@ -79,7 +79,17 @@ function ansible:build {
   locality_name: ${LOCALITY_NAME}
   organization_name: ${ORGANIZATION_NAME}
   ca_common_name: ${CA_COMMON_NAME}
+  # nginx vars
 EOF
+  if [[ -n ${DOMAIN} ]]; then
+    echo "domain: ${DOMAIN}" >> ${VARS_PATH};
+  else echo "default_domain: $(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})" >> ${VARS_PATH};
+  fi
+
+  if [[ -n ${SUBDOMAIN} ]]; then
+    echo "subdomain: ${SUBDOMAIN}" >> ${VARS_PATH};
+  else echo "subdomain: www" >> ${VARS_PATH};
+  fi
 }
 
 function ansible:deploy {

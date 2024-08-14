@@ -9,7 +9,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services data
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 3
 
 - name: add 3 node index + query
@@ -22,7 +22,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services data
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 3
 
 - name: add 5 node data
@@ -35,7 +35,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services data
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 5
 
 - name: add 5 node query and index
@@ -48,7 +48,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services index,query
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 5 
 
 - name: add 7 node data
@@ -61,7 +61,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services data
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 7
 
 - name: add 7 node query and index
@@ -74,7 +74,7 @@
       --server-add-password {{ couchbase_admin_password | quote }} \
       --services index,query
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   when: server_count == 7 
 
 - name: rebalance nodes
@@ -83,4 +83,4 @@
       --username Administrator \
       --password {{ couchbase_admin_password | quote }}
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost

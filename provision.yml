@@ -6,6 +6,18 @@
     - group_vars/couchbase/vars
 
   tasks: 
+  # check memory
+  - name: set couchbase memory
+    lineinfile:
+      path: ./group_vars/couchbase/vars
+      line: | 
+         cb_mem: '{{ ((ansible_memtotal_mb - 1024) * 0.8) | int }}' 
+  
+  - name: check minumum memory
+    fail: 
+      msg: "CouchBase Server requires a minumum of 8GB RAM"
+    when: cb_mem | int < 5530
+
     # sudo user sanitation
   - name: get local system users
     slurp:
@@ -35,17 +47,6 @@
         couchbase_admin_password: {{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}
     no_log: true
   
-  - name: set couchbase memory
-    lineinfile:
-      path: ./group_vars/couchbase/vars
-      line: | 
-         cb_mem: '{{ ((ansible_memtotal_mb - 1024) * 0.8) | int }}' 
-  
-  - name: check minumum memory
-    fail: 
-      msg: "CouchBase Server requires a minumum of 8GB RAM"
-    when: cb_mem | int < 5530
-
   - name: create couchbase cluster
     linode.cloud.instance: 
       label: '{{ instance_prefix }}-{{ item | int +1 }}-{{ uuid }}'
@@ -56,6 +57,7 @@
       root_pass: '{{ root_pass }}'
       authorized_keys: '{{ ssh_keys }}'
       private_ip: true
+      tags: '{{ linode_tags }}'
 # unlink from prod stackscript_id during testing
 #      stackscript_id: 1366193
 #      ua_prefix: 'marketplace-couchbase-occ'

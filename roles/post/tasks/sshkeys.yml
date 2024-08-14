@@ -5,14 +5,14 @@
   slurp:
     src: "/etc/shadow"
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
   register: shadow
 
 - name: set root password
   set_fact:
     root_password: "{{ shadow['content'] | b64decode | regex_search('^root.+') }}"
   run_once: true
-  delegate_to: "{{ groups['couchbase_cluster'][0] }}"
+  delegate_to: localhost
 
 # set account passwords
 - name: set root password on remote nodes
