@@ -31,6 +31,7 @@ exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
   if [ "$?" != "0" ] || [ "$SUCCESS" == "true" ]; then
+    deactivate
     cd ${HOME}
     if [ -d "/tmp/linode" ]; then
       rm -rf /tmp/linode
@@ -38,9 +39,9 @@ function cleanup {
     if [ -f "/usr/local/bin/run" ]; then
       rm /usr/local/bin/run
     fi
-    stackscript_cleanup
   fi
 }
+
 function add_privateip {
   echo "[info] Adding instance private IP"
   curl -H "Content-Type: application/json" \
