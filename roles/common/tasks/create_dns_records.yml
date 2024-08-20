@@ -28,7 +28,7 @@
   block:
     - name: lookup domain info
       linode.cloud.domain_info:
-        api_token: "{{ token_password }}"
+        api_token: "{{ api_token }}"
         domain: "{{ domain }}"
       register: domain_output
       when: domain is defined
@@ -52,7 +52,7 @@
 
 - name: create a dns zone
   linode.cloud.domain:
-    api_token: "{{ token_password }}"
+    api_token: "{{ api_token }}"
     domain: "{{ domain }}"
     state: present
     type: master
@@ -63,7 +63,7 @@
 
 - name: create A record for domain
   linode.cloud.domain_record:
-    api_token: "{{ token_password }}"
+    api_token: "{{ api_token }}"
     domain: "{{ domain }}"
     name: "{{ domain }}"
     type: 'A'
@@ -76,7 +76,7 @@
 
 - name: create A record for subdomain
   linode.cloud.domain_record:
-    api_token: "{{ token_password }}"
+    api_token: "{{ api_token }}"
     domain: "{{ domain }}"
     name: "{{ subdomain }}"
     type: 'A'

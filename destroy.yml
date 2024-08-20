@@ -1,12 +1,11 @@
 ---
 # destroy linodes
-
-- name: destroying linodes
+- name: Destroying Linodes
   hosts: localhost
   connection: local
   vars_files:
       - group_vars/couchbase/vars
-  
+
   tasks:
   - name: deleting linodes except provisioner
     linode.cloud.instance:
