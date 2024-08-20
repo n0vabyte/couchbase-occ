@@ -83,6 +83,6 @@
 
 - name: set dns fact for default rdns
   set_fact:
-    _domain: '{{ default_dns }}'
+    _domain: '{{ default_domain }}'
     cacheable: true
   when: domain is not defined

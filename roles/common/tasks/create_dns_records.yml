@@ -24,7 +24,6 @@
   register: ip_address
 
 # loop through domains the provided API token has grants to. Creating an A record without a zone, or creating a duplicate zone will fail the play.
-# or creating a duplicate zone will fail the play.
 - name: check existence of domain zone
   block:
     - name: lookup domain info
@@ -57,7 +56,7 @@
     domain: "{{ domain }}"
     state: present
     type: master
-    soa_email: "{{ soa_email_address }}"
+    soa_email: "{{ email_address }}"
   when:
     - domain is defined
     - domain_output.zone_file.zone_file.0 is not defined

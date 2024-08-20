@@ -19,7 +19,7 @@ fi
 # <UDF name="organization_name" label="Organization" example="Example: Akamai Technologies"  />
 # <UDF name="ca_common_name" label="CA Common Name" default="Couchbase CA" />
 ## NGINX variables
-# <UDF name="domain" label="Domain address for HTTPS reverse proxy" example="fqdn.tld"  />
+# <UDF name="domain" label="Domain address for HTTPS reverse proxy" />
 # <UDF name="subdomain" label="Subdomain address for HTTPS reverse proxy" default="www"  />
 # git repo
 export GIT_REPO="https://github.com/akamai-compute-marketplace/couchbase-occ.git"

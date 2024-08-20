@@ -13,7 +13,7 @@
 # dry run
 - name: run dry-run for domain
   shell:
-    cmd: "certbot -n --standalone --agree-tos --dry-run --redirect certonly -d {{ _domain }} -m {{ email_address }}"
+    cmd: "certbot -n --standalone --agree-tos --dry-run certonly -d {{ _domain }} -m {{ email_address }}"
   register: dry_run
   until: dry_run is not failed
   retries: 3
@@ -29,4 +29,4 @@
 
 - name: installing let's encrypt certificate on provisioner
   shell:
-    cmd: "certbot -n --standalone --agree-tos --redirect certonly -d {{ _domain }} -m {{ email_address }}"
+    cmd: "certbot -n --standalone --agree-tos certonly -d {{ _domain }} -m {{ email_address }}"
