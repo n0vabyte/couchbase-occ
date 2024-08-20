@@ -8,6 +8,7 @@ pyyaml==6.0.1
 dnspython==2.2.1
 passlib==1.7.4
 ## cloud.linode module dependancies ##
-linode-api4==5.15.1
-polling==0.3.2
-ansible-specdoc==0.0.14
+linode-api4>=5.19.0
+polling>=0.3.2
+types-requests==2.32.0.20240712
+ansible-specdoc>=0.0.15
