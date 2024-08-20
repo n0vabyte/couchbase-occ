@@ -16,6 +16,7 @@ function cleanup {
 
 # constants
 readonly VARS_PATH="./group_vars/couchbase/vars"
+readonly RDNS=$(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})
 
 # utility functions
 function destroy {
@@ -80,16 +81,8 @@ function ansible:build {
   organization_name: ${ORGANIZATION_NAME}
   ca_common_name: ${CA_COMMON_NAME}
   # nginx vars
+  _domain: ${RDNS}
 EOF
-  if [[ -n ${DOMAIN} ]]; then
-    echo "domain: ${DOMAIN}" >> ${VARS_PATH};
-  else echo "default_domain: $(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})" >> ${VARS_PATH};
-  fi
-
-  if [[ -n ${SUBDOMAIN} ]]; then
-    echo "subdomain: ${SUBDOMAIN}" >> ${VARS_PATH};
-  else echo "subdomain: www" >> ${VARS_PATH};
-  fi
 }
 
 function ansible:deploy {
