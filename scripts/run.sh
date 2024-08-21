@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-DEBUG="NO"
+DEBUG="YES"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
